@@ -1,4 +1,6 @@
 package com.example.joinme
+import android.content.Intent
+import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.view.LayoutInflater
@@ -56,6 +58,15 @@ class ActivityAdapter(private val activityList: MutableList<ActivityModel>) :
                     }
                 }
             }
+
+            holder.location.setOnClickListener {
+
+                val mapUri = Uri.parse("geo:0,0?q=${item.location}")
+                val intent = Intent(Intent.ACTION_VIEW, mapUri)
+                holder.itemView.context.startActivity(intent)
+
+            }
+
         }
         override fun getItemCount(): Int {
             return activityList.size
