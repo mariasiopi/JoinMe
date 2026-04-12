@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">JoinMe</string>
+    <string name="navigation_drawer_open">Άνοιγμα μενού</string>
+    <string name="navigation_drawer_close">Κλείσιμο μενού</string>
 </resources>
