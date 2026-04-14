@@ -2,12 +2,14 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
+        android:fitsSystemWindows="true"
         android:layout_height="wrap_content"
         android:layout_width="match_parent">
 
@@ -19,12 +21,10 @@
 
         <com.google.android.material.tabs.TabLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Διαθέσιμες" />
+            android:layout_height="wrap_content"> <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Διαθέσιμες" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
@@ -40,63 +40,36 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <Button
-
             android:id="@+id/filterBtn"
-
-            android:layout_width="112dp"
-
-            android:layout_height="51dp"
-
-            android:layout_marginStart="16dp"
-
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
             android:text="Φίλτρα"
-
             app:layout_constraintStart_toStartOf="parent"
-
             app:layout_constraintTop_toTopOf="parent" />
 
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-
-            android:id="@+id/floatingActionButton"
-
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-
-            android:layout_marginEnd="16dp"
-
-            android:layout_marginBottom="16dp"
-
-            android:contentDescription="Προσθήκη"
-
-            android:clickable="true"
-
-            app:layout_constraintBottom_toBottomOf="parent"
-
-            app:layout_constraintEnd_toEndOf="parent"
-
-            app:srcCompat="@android:drawable/ic_menu_add" />
-
-
         <androidx.recyclerview.widget.RecyclerView
-
             android:id="@+id/activitiesRecyclerView"
-
             android:layout_width="0dp"
-
             android:layout_height="0dp"
-
+            android:layout_marginTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-
             app:layout_constraintEnd_toEndOf="parent"
-
             app:layout_constraintStart_toStartOf="parent"
-
             app:layout_constraintTop_toBottomOf="@+id/filterBtn"
-
             tools:listitem="@layout/item_activity_card" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_gravity="bottom|end"
+        android:contentDescription="Προσθήκη"
+        android:clickable="true"
+        android:focusable="true"
+        app:srcCompat="@android:drawable/ic_menu_add" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

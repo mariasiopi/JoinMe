@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity() {
             val okBtn = dialogLayout.findViewById<Button>(R.id.okBtn)
             val cancelBtn = dialogLayout.findViewById<Button>(R.id.cancelBtn)
 
+            //Ρύθμιση πεδίου ημερομηνίας και ώρας
             dateInput.setOnClickListener {
                 val calendar = java.util.Calendar.getInstance()
                 val datePicker = android.app.DatePickerDialog(
@@ -94,8 +95,6 @@ class MainActivity : AppCompatActivity() {
                 )
                 timePicker.show()
             }
-
-
 
             // Τι γίνεται στο κλικ του "X"
             cancelBtn.setOnClickListener {
