@@ -59,10 +59,43 @@ class MainActivity : AppCompatActivity() {
             // Βρίσκουμε τα στοιχεία
             val titleInput = dialogLayout.findViewById<EditText>(R.id.titleInput)
             val dateInput = dialogLayout.findViewById<EditText>(R.id.dateInput)
+            val timeInput = dialogLayout.findViewById<EditText>(R.id.timeInput)
             val locationInput = dialogLayout.findViewById<EditText>(R.id.locationInput)
             val maxParticipantsInput = dialogLayout.findViewById<EditText>(R.id.maxParticipantsInput)
             val okBtn = dialogLayout.findViewById<Button>(R.id.okBtn)
             val cancelBtn = dialogLayout.findViewById<Button>(R.id.cancelBtn)
+
+            dateInput.setOnClickListener {
+                val calendar = java.util.Calendar.getInstance()
+                val datePicker = android.app.DatePickerDialog(
+                    this,
+                    { _, year, month, dayOfMonth ->
+                        val selectedDate = "$dayOfMonth/${month + 1}/$year"
+                        dateInput.setText(selectedDate)
+                    },
+                    calendar.get(java.util.Calendar.YEAR),
+                    calendar.get(java.util.Calendar.MONTH),
+                    calendar.get(java.util.Calendar.DAY_OF_MONTH)
+                )
+                datePicker.show()
+            }
+
+            timeInput.setOnClickListener {
+                val calendar = java.util.Calendar.getInstance()
+                val timePicker = android.app.TimePickerDialog(
+                    this,
+                    { _, hourOfDay, minute ->
+                        val selectedTime = String.format("%02d:%02d", hourOfDay, minute)
+                        timeInput.setText(selectedTime)
+                    },
+                    calendar.get(java.util.Calendar.HOUR_OF_DAY),
+                    calendar.get(java.util.Calendar.MINUTE),
+                    true // true για 24ωρη μορφή
+                )
+                timePicker.show()
+            }
+
+
 
             // Τι γίνεται στο κλικ του "X"
             cancelBtn.setOnClickListener {
@@ -73,13 +106,13 @@ class MainActivity : AppCompatActivity() {
             okBtn.setOnClickListener {
                 val title = titleInput.text.toString()
                 val date = dateInput.text.toString()
+                val time = timeInput.text.toString()
                 val location = locationInput.text.toString()
                 val maxPart = maxParticipantsInput.text.toString().toIntOrNull() ?: 0
 
                 if (title.isNotEmpty()) {
                     // Δημιουργούμε το νέο αντικείμενο
-
-                    val newActivity = ActivityModel(title, date, 0, maxPart, location)
+                    val newActivity = ActivityModel(title, date, time,0, maxPart, location)
 
                     // Προσθήκη στη λίστα και ενημέρωση του Adapter
                     activityList.add(newActivity)
@@ -90,10 +123,7 @@ class MainActivity : AppCompatActivity() {
                     titleInput.error = "Παρακαλώ βάλε έναν τίτλο"
                 }
             }
-
             dialog.show()
         }
-
-
     }
 }

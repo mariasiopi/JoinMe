@@ -14,6 +14,7 @@ class ActivityAdapter(private val activityList: MutableList<ActivityModel>) :
         class ActivityViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val title: TextView = view.findViewById(R.id.cardTitle)
             val date: TextView = view.findViewById(R.id.cardDate)
+            val time: TextView = view.findViewById(R.id.cardTime)
             var participants: TextView = view.findViewById(R.id.cardParticipants)
             val location: TextView = view.findViewById(R.id.cardLocation)
             val participateBtn: Button = view.findViewById<Button>(R.id.participateBtn)
@@ -25,13 +26,11 @@ class ActivityAdapter(private val activityList: MutableList<ActivityModel>) :
             return ActivityViewHolder(view)
         }
 
-
-
-
         override fun onBindViewHolder(holder: ActivityViewHolder, position: Int) {
             val item = activityList[position]
             holder.title.text = item.title
             holder.date.text = item.date
+            holder.time.text = item.time
             holder.participants.text = "${item.participants} / ${item.maxParticipants} Συμμετοχές"
             holder.location.text = item.location
 
