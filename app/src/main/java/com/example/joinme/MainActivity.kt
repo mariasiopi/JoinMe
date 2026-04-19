@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 class MainActivity : AppCompatActivity() {
 
-    private val activityList = mutableListOf<ActivityModel>()
     private lateinit var adapter: ActivityAdapter
+    private val activityList = mutableListOf<ActivityModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,23 +26,15 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        //Ρύθμιση Toolbar και DrawerMenu
-        val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-
+        //Ρύθμιση DrawerMenu
         val drawerLayout = findViewById<androidx.drawerlayout.widget.DrawerLayout>(R.id.drawer_layout)
         val toggle = androidx.appcompat.app.ActionBarDrawerToggle(
-            this, drawerLayout, toolbar,
+            this, drawerLayout,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-
-        val recyclerView = findViewById<RecyclerView>(R.id.activitiesRecyclerView)
-        adapter = ActivityAdapter(activityList)
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
 
         //Προσθήκη δραστηριότητας
         val fab = findViewById<FloatingActionButton>(R.id.floatingActionButton)

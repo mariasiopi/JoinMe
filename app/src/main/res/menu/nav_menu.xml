@@ -2,11 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/main"
-            android:title="Αρχική" />
+            android:id="@+id/profile"
+            android:title="Προφίλ" />
         <item
-            android:id="@+id/activities"
+            android:id="@+id/AvailableActFragment"
             android:title="Δραστηριότητες" />
+        <item
+            android:id="@+id/MyActFragment"
+            android:title="Δικές μου δραστηριότητες" />
 
     </group>
     <group android:checkableBehavior="single">
