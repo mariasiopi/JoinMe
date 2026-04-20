@@ -8,13 +8,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.joinme.data.entities.Activity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: ActivityAdapter
-    private val activityList = mutableListOf<ActivityModel>()
+    private lateinit var activityViewModel: ActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +27,8 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        //Αρχικοποιηση του ViewModel
+        activityViewModel = ViewModelProvider(this).get(ActivityViewModel::class.java)
 
         //Ρύθμιση DrawerMenu
         val drawerLayout = findViewById<androidx.drawerlayout.widget.DrawerLayout>(R.id.drawer_layout)
@@ -103,12 +107,16 @@ class MainActivity : AppCompatActivity() {
 
                 if (title.isNotEmpty()) {
                     // Δημιουργούμε το νέο αντικείμενο
-                    val newActivity = ActivityModel(title, date, time,0, maxPart, location)
-
+                    val activityEntity = Activity(
+                        title = title,
+                        date = date,
+                        time = time,
+                        location = location,
+                        maxParticipants = maxPart,
+                        creatorId = 1
+                    )
                     // Προσθήκη στη λίστα και ενημέρωση του Adapter
-                    activityList.add(newActivity)
-                    adapter.notifyItemInserted(activityList.size - 1)
-
+                    activityViewModel.insert(activityEntity)
                     dialog.dismiss() // Κλείνουμε τη φούσκα
                 } else {
                     titleInput.error = "Παρακαλώ βάλε έναν τίτλο"

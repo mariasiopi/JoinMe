@@ -15,9 +15,9 @@ import androidx.room.PrimaryKey
 data class Activity (
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val title: String = "",
+    val creatorId: Int,
     val date: String = "",
     val time: String = "",
     val maxParticipants: Int = 0,
     val location: String = "",
-    val creatorId: Long
-)
+    )

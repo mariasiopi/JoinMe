@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ActivitiesDao {
@@ -20,9 +21,9 @@ interface ActivitiesDao {
 
     //Query για τις δικες μου δραστηριοτητες
     @Query("SELECT * FROM activities WHERE creatorId = :Id")
-    fun getActivitiesForUser(Id: Long): List<Activity>
+    fun getUsersActivities(Id: Int): Flow<List<Activity>>
 
     //Query για τις δραστηριοτητες των αλλων
     @Query("SELECT * FROM activities WHERE creatorId != :Id")
-    fun getOthersActivities(Id: Long): List<Activity>
+    fun getOthersActivities(Id: Int): Flow<List<Activity>>
 }
