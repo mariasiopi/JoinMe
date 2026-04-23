@@ -14,8 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.joinme.data.entities.Activity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 class MainActivity : AppCompatActivity() {
-
-    private lateinit var adapter: ActivityAdapter
     private lateinit var activityViewModel: ActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {

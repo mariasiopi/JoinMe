@@ -9,6 +9,7 @@ import androidx.room.Room
 
 abstract class AppDatabase : RoomDatabase() {
     abstract fun activitiesDao(): ActivitiesDao
+    abstract fun userDao(): UserDao
     abstract fun userActivityJoinDao(): UserActivityJoinDao
 
     companion object {

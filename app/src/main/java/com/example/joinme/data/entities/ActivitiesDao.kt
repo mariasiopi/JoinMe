@@ -21,9 +21,10 @@ interface ActivitiesDao {
 
     //Query για τις δικες μου δραστηριοτητες
     @Query("SELECT * FROM activities WHERE creatorId = :Id")
-    fun getUsersActivities(Id: Int): Flow<List<Activity>>
+    fun getMyActivities(Id: Long): Flow<List<Activity>>
 
     //Query για τις δραστηριοτητες των αλλων
     @Query("SELECT * FROM activities WHERE creatorId != :Id")
-    fun getOthersActivities(Id: Int): Flow<List<Activity>>
+    fun getOthersActivities(Id: Long): Flow<List<Activity>>
+
 }

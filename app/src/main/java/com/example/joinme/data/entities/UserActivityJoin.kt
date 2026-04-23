@@ -18,7 +18,7 @@ import androidx.room.PrimaryKey
         )
     ])
 data class UserActivityJoin (
-    @PrimaryKey(autoGenerate = true) val participationId: Int = 0,
+    @PrimaryKey(autoGenerate = true) val participationId: Long = 0,
     val participantId: Long,
     val activityId: Long
 )
