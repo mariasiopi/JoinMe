@@ -7,8 +7,8 @@ import androidx.room.Query
 interface UserDao {
 
     @Insert
-    suspend fun insertUser(user: User): Long
+    fun insertUser(user: User)
 
     @Query("SELECT userId FROM users WHERE username = :username")
-    suspend fun getUserIdByName(username: String): Int
+    fun getUserIdByName(username: String): Long
 }

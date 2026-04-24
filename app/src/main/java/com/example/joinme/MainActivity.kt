@@ -6,15 +6,25 @@ import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.example.joinme.data.entities.Activity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
+
 class MainActivity : AppCompatActivity() {
     private lateinit var activityViewModel: ActivityViewModel
+    private var currentId: Long = -1
+    private lateinit var navController: NavController
+    private lateinit var drawerLayout: DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,19 +35,39 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        //Αρχικοποιηση του ViewModel
-        activityViewModel = ViewModelProvider(this).get(ActivityViewModel::class.java)
 
-        //Ρύθμιση DrawerMenu
-        val drawerLayout = findViewById<androidx.drawerlayout.widget.DrawerLayout>(R.id.drawer_layout)
-        val toggle = androidx.appcompat.app.ActionBarDrawerToggle(
-            this, drawerLayout,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
+        //Εύρεση του NavHostFragment και του NavController
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+
+        //Ρύθμιση της Toolbar
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        //Ρύθμιση DrawerMenu και του NavigationView
+        drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
+        val navView: NavigationView = findViewById(R.id.nav_view)
+
+        //Σύνδεση του NavController με το NavigationView (Μενού)
+        navView.setupWithNavController(navController)
+
+        //Ρύθμιση του AppBarConfiguration
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(R.id.LoginFragment, R.id.AvailableActFragment, R.id.MyActFragment),
+            drawerLayout
         )
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
 
+        //Σύνδεση της ActionBar με τον NavController
+        setupActionBarWithNavController(navController, appBarConfiguration)
+
+        activityViewModel = ViewModelProvider(this)[ActivityViewModel::class.java]
+
+        activityViewModel.currentId.observe(this) { id ->
+            if (id != null) {
+                currentId = id // Ενημέρωση της μεταβλητής μόλις αλλάξει το ID στο Login
+            }
+        }
         //Προσθήκη δραστηριότητας
         val fab = findViewById<FloatingActionButton>(R.id.floatingActionButton)
 
@@ -55,7 +85,8 @@ class MainActivity : AppCompatActivity() {
             val dateInput = dialogLayout.findViewById<EditText>(R.id.dateInput)
             val timeInput = dialogLayout.findViewById<EditText>(R.id.timeInput)
             val locationInput = dialogLayout.findViewById<EditText>(R.id.locationInput)
-            val maxParticipantsInput = dialogLayout.findViewById<EditText>(R.id.maxParticipantsInput)
+            val maxParticipantsInput =
+                dialogLayout.findViewById<EditText>(R.id.maxParticipantsInput)
             val okBtn = dialogLayout.findViewById<Button>(R.id.okBtn)
             val cancelBtn = dialogLayout.findViewById<Button>(R.id.cancelBtn)
 
@@ -111,7 +142,7 @@ class MainActivity : AppCompatActivity() {
                         time = time,
                         location = location,
                         maxParticipants = maxPart,
-                        creatorId = 1
+                        creatorId = currentId
                     )
                     // Προσθήκη στη λίστα και ενημέρωση του Adapter
                     activityViewModel.insert(activityEntity)
@@ -122,5 +153,22 @@ class MainActivity : AppCompatActivity() {
             }
             dialog.show()
         }
+    }
+
+    // Επιτρέπει στο κουμπί "πάνω αριστερά" (hamburger icon) να ανοίγει το μενού
+    override fun onSupportNavigateUp(): Boolean {
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(R.id.LoginFragment, R.id.AvailableActFragment, R.id.MyActFragment),
+            drawerLayout
+        )
+        return androidx.navigation.ui.NavigationUI.navigateUp(
+            navController,
+            appBarConfiguration
+        )
+                || super.onSupportNavigateUp()
     }
 }

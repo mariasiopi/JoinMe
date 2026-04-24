@@ -40,8 +40,6 @@ class ActivityAdapter(private val activityList: MutableList<Activity> = mutableL
         override fun onBindViewHolder(holder: ActivityViewHolder, position: Int) {
 
             val item = activityList[position]
-            val current = item.currentParticipants
-            val max = item.maxParticipants
 
             holder.title.text = item.title
             holder.date.text = item.date
@@ -53,11 +51,11 @@ class ActivityAdapter(private val activityList: MutableList<Activity> = mutableL
             if (isMyActivity) {
                 holder.participateBtn.text = "Διαγραφή"
                 holder.participateBtn.setBackgroundColor(android.graphics.Color.RED)
-                onDeleteClick(item)
+                holder.participateBtn.setOnClickListener { onDeleteClick(item) }
             } else {
                 holder.participateBtn.text = "Συμμετοχή"
                 holder.participateBtn.setBackgroundColor(android.graphics.Color.BLUE)
-                onParticipateClick(item)
+                holder.participateBtn.setOnClickListener { onParticipateClick(item) }
 
 
                 // Αυτό τρέχει ΚΑΘΕ ΦΟΡΑ που εμφανίζεται μια κάρτα

@@ -6,10 +6,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
-import com.example.joinme.data.entities.Activity
 import kotlinx.coroutines.launch
 
 class AvailableActivityFragment : Fragment(R.layout.fragment_available_activity) {
@@ -34,8 +32,8 @@ class AvailableActivityFragment : Fragment(R.layout.fragment_available_activity)
         // Ενημέρωση της λίστας με τα δεδομένα από το ViewModel
         viewModel.currentId.observe(viewLifecycleOwner){ id ->
             if(id != null && id > 0){
-                lifecycleScope.launch {
-                    viewModel.getAllActivities(id).asLiveData().observe(viewLifecycleOwner) { activities ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.getAllActivities(id).collect { activities ->
                         adapter.updateData(activities)
                     }
                 }

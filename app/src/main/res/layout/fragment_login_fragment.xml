@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".login_fragment">
-
+    tools:context=".LoginFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -29,7 +28,7 @@
             android:layout_marginTop="44dp"
             android:ems="10"
             android:inputType="text"
-            android:text="Όνομα χρήστη"
+            android:hint="Όνομα χρήστη"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -41,7 +40,7 @@
             android:layout_marginTop="32dp"
             android:ems="10"
             android:inputType="text"
-            android:text="Email"
+            android:hint="Email"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editName" />

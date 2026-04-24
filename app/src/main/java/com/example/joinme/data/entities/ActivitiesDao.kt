@@ -11,13 +11,13 @@ import kotlinx.coroutines.flow.Flow
 interface ActivitiesDao {
 
     @Insert
-    suspend fun insertActivity(activity: Activity)
+    fun insertActivity(activity: Activity)
 
     @Update
-    suspend fun updateActivity(activity: Activity)
+    fun updateActivity(activity: Activity)
 
     @Delete
-    suspend fun deleteActivity(activity: Activity)
+    fun deleteActivity(activity: Activity)
 
     //Query για τις δικες μου δραστηριοτητες
     @Query("SELECT * FROM activities WHERE creatorId = :Id")

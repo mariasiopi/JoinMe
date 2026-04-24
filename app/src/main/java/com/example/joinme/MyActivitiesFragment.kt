@@ -7,10 +7,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.observe
-import com.example.joinme.data.entities.Activity
 
-class MyActivityFragment : Fragment(R.layout.fragment_my_activities) {
+class MyActivitiesFragment : Fragment(R.layout.fragment_my_activities) {
 
     private lateinit var adapter: ActivityAdapter
     private val viewModel: ActivityViewModel by activityViewModels()

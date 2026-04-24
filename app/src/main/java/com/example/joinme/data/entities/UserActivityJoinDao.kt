@@ -9,16 +9,16 @@ import kotlinx.coroutines.flow.Flow
 interface UserActivityJoinDao {
 
     @Insert
-    suspend fun insertJoin(join: UserActivityJoin)
+    fun insertJoin(join: UserActivityJoin)
 
     @Query("SELECT COUNT(*) FROM UserActivityJoin WHERE activityId = :activityId")
     fun getParticipantsCount(activityId: Long): Flow<Int>
 
-    /*@Query("""
+    @Query("""
     SELECT *, 
     (SELECT COUNT(*) FROM UserActivityJoin WHERE activityId = activities.id) AS currentParticipants 
     FROM activities 
     WHERE creatorId != :userId
 """)
-    fun getParticipants(userId: Long): Flow<List<Activity>> */
+    fun getParticipants(userId: Long): Flow<List<Activity>>
 }

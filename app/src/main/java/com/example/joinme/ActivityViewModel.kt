@@ -23,9 +23,10 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
     val currentId: LiveData<Long> get() = _currentId
 
 
-    fun login(name: String, email: String) = viewModelScope.launch{
-        val userId = userDao.insertUser(User(username = name, email = email))
-        _currentId.value = userId
+    fun login(name: String, email: String) = viewModelScope.launch(Dispatchers.IO){
+        userDao.insertUser(User(username = name, email = email))
+        val userId = userDao.getUserIdByName(name)
+        _currentId.postValue(userId)
     }
 
     // Ερώτημα 1: Όλες οι διαθέσιμες δραστηριότητες (χρήση Flow για αυτόματη ενημέρωση)
@@ -43,17 +44,15 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
         activitiesDao.insertActivity(activity)
     }
 
-    fun delete(activity: Activity) = viewModelScope.launch {
+    fun delete(activity: Activity) = viewModelScope.launch(Dispatchers.IO) {
         activitiesDao.deleteActivity(activity)
     }
 
-    fun participate(activityId: Long) = viewModelScope.launch {
+    fun participate(activityId: Long) = viewModelScope.launch(Dispatchers.IO) {
         val userId = _currentId.value
         if (userId != null && userId > 0) {
-            viewModelScope.launch {
                 val join = UserActivityJoin(participantId = userId, activityId = activityId)
                 db.userActivityJoinDao().insertJoin(join)
-            }
         }
     }
 }

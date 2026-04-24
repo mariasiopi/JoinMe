@@ -2,16 +2,21 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
 xmlns:app="http://schemas.android.com/apk/res-auto"
 android:id="@+id/nav_graph"
-app:startDestination="@id/AvailableActFragment">
+app:startDestination="@id/LoginFragment">
 
-<fragment
-    android:id="@+id/AvailableActFragment"
-    android:name="com.example.joinme.AvailableActivityFragment"
-    android:label="Διαθέσιμες Δραστηριότητες" />
+    <fragment
+        android:id="@+id/LoginFragment"
+        android:name="com.example.joinme.LoginFragment"
+        android:label="Σύνδεση" />
 
-<fragment
-    android:id="@+id/MyActFragment"
-    android:name="com.example.joinme.MyActivitiesFragment"
-    android:label="Οι Δραστηριότητές μου" />
+    <fragment
+        android:id="@+id/AvailableActFragment"
+        android:name="com.example.joinme.AvailableActivityFragment"
+        android:label="Διαθέσιμες Δραστηριότητες" />
+
+    <fragment
+        android:id="@+id/MyActFragment"
+        android:name="com.example.joinme.MyActivitiesFragment"
+        android:label="Οι Δραστηριότητές μου" />
 
 </navigation>
