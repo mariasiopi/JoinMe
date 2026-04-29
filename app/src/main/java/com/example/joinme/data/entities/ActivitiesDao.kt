@@ -19,12 +19,15 @@ interface ActivitiesDao {
     @Delete
     fun deleteActivity(activity: Activity)
 
-    //Query για τις δικες μου δραστηριοτητες
+    //Query για τις δικές μου δραστηριότητες
     @Query("SELECT * FROM activities WHERE creatorId = :Id")
     fun getMyActivities(Id: Long): Flow<List<Activity>>
 
-    //Query για τις δραστηριοτητες των αλλων
+    //Query για τις δραστηριότητες των άλλων
     @Query("SELECT * FROM activities WHERE creatorId != :Id")
     fun getOthersActivities(Id: Long): Flow<List<Activity>>
 
+    @Query("""UPDATE activities SET currentParticipants = currentParticipants + 1 
+            WHERE id = :activityId AND currentParticipants < maxParticipants""")
+    fun incParticipants(activityId: Long)
 }

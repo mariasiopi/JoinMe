@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 
 class LoginFragment : Fragment(R.layout.fragment_login_fragment) {
@@ -33,8 +34,11 @@ class LoginFragment : Fragment(R.layout.fragment_login_fragment) {
 
         activityViewModel.currentId.observe(viewLifecycleOwner) { id ->
             if (id != null && id > 0) {
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(R.id.LoginFragment, true) // Το 'true' σημαίνει ότι αφαιρεί και το ίδιο το LoginFragment
+                    .build()
                 // Ο NavController διαβάζει το nav_graph.xml και σε πηγαίνει στο AvailableActFragment
-                findNavController().navigate(R.id.AvailableActFragment)
+                findNavController().navigate(R.id.AvailableActFragment, null, navOptions)
             }
         }
     }

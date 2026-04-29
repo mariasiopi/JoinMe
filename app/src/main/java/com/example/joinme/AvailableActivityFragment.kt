@@ -20,7 +20,6 @@ class AvailableActivityFragment : Fragment(R.layout.fragment_available_activity)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewAvailable)
 
-
         adapter = ActivityAdapter(mutableListOf(),
             false,
             onParticipateClick = { activity ->

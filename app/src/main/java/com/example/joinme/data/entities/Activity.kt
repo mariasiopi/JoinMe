@@ -20,5 +20,5 @@ data class Activity (
     val time: String = "",
     val maxParticipants: Int = 0,
     val location: String = "",
-    var currentParticipants: Int = 0
+    val currentParticipants: Int = 0
     )

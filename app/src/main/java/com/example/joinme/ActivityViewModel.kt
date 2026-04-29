@@ -1,7 +1,6 @@
 package com.example.joinme
 
 import android.app.Application
-import android.widget.EditText
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,12 +12,14 @@ import com.example.joinme.data.entities.UserActivityJoin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import com.google.firebase.firestore.FirebaseFirestore
 
 class ActivityViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = AppDatabase.getDatabase(application)
     private val activitiesDao = db.activitiesDao()
     private val userDao = db.userDao()
+    private val firestore = FirebaseFirestore.getInstance()
     private val _currentId = MutableLiveData<Long>()
     val currentId: LiveData<Long> get() = _currentId
 
@@ -39,7 +40,7 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
         return activitiesDao.getMyActivities(currentId)
     }
 
-    // Συνάρτηση για προσθήκη (Insert) - θα καλείται από το FAB της MainActivity
+    // Συνάρτηση για προσθήκη (Insert) - καλείται από το FAB της MainActivity
     fun insert(activity: Activity) = viewModelScope.launch(Dispatchers.IO) {
         activitiesDao.insertActivity(activity)
     }
@@ -53,6 +54,22 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
         if (userId != null && userId > 0) {
                 val join = UserActivityJoin(participantId = userId, activityId = activityId)
                 db.userActivityJoinDao().insertJoin(join)
+                db.activitiesDao().incParticipants(activityId)
         }
+    }
+
+    //-----------------------Firestore--------------------------------
+    fun participateInActivityCloud(activity: Activity, username: String, email: String) {
+        val participation = hashMapOf(
+            "activityId" to activity.id,
+            "activityTitle" to activity.title,
+            "username" to username,
+            "email" to email
+        )
+        firestore.collection("participations")
+            .add(participation)
+            .addOnFailureListener{
+                //
+            }
     }
 }

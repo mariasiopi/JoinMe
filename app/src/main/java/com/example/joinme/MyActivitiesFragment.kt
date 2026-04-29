@@ -4,9 +4,12 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.asFlow
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MyActivitiesFragment : Fragment(R.layout.fragment_my_activities) {
 
@@ -26,10 +29,12 @@ class MyActivitiesFragment : Fragment(R.layout.fragment_my_activities) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         // Ενημέρωση της λίστας με τα δεδομένα από το ViewModel
-        viewModel.currentId.observe(viewLifecycleOwner){ id ->
-            if(id != null && id > 0){
-                viewModel.getMyActivities(id).asLiveData().observe(viewLifecycleOwner) { activities ->
-                    adapter.updateData(activities)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.currentId.asFlow().collectLatest{ id ->
+                if(id != null && id > 0){
+                    viewModel.getMyActivities(id).collect { activities ->
+                        adapter.updateData(activities)
+                    }
                 }
             }
         }

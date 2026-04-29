@@ -1,6 +1,11 @@
 package com.example.joinme
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
@@ -12,11 +17,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
 import com.example.joinme.data.entities.Activity
+import com.google.android.material.color.DynamicColors
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 
@@ -24,37 +31,74 @@ class MainActivity : AppCompatActivity() {
     private lateinit var activityViewModel: ActivityViewModel
     private var currentId: Long = -1
     private lateinit var navController: NavController
-    private lateinit var drawerLayout: DrawerLayout
+    private var drawerLayout: DrawerLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        DynamicColors.applyToActivitiesIfAvailable(application)
         setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.drawer_layout)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        //Ρύθμιση DrawerMenu και του NavigationView
+        drawerLayout = findViewById<View>(R.id.main_root) as? DrawerLayout
+        val navView: NavigationView = findViewById(R.id.nav_view)
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
         //Εύρεση του NavHostFragment και του NavController
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        //Ρύθμιση της Toolbar
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            val fab: FloatingActionButton? = findViewById(R.id.floatingActionButton)
+            navView.setCheckedItem(destination.id)
+            if (destination.id == R.id.LoginFragment) {
+                // 1. Κλειδώνουμε την οθόνη σε Portrait μόνο για το Login
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        //Ρύθμιση DrawerMenu και του NavigationView
-        drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
+                // 2. Κρύβουμε FAB και Toolbar
+                fab?.visibility = View.GONE
+                supportActionBar?.hide()
+            } else {
+                // 1. Επιτρέπουμε τη στροφή της οθόνης (Landscape) στις υπόλοιπες οθόνες
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
-        //Σύνδεση του NavController με το NavigationView (Μενού)
-        navView.setupWithNavController(navController)
+                // 2. Εμφανίζουμε FAB και Toolbar
+                fab?.visibility = View.VISIBLE
+                supportActionBar?.show()
+            }
+        }
+
+        navView.setNavigationItemSelectedListener { menuItem ->
+            // Ορίζουμε ειδικές επιλογές για να μη "κολλάει" το Fragment
+            val options = NavOptions.Builder()
+                .setLaunchSingleTop(true)
+                .setRestoreState(true)
+                .build()
+
+            when (menuItem.itemId) {
+                R.id.AvailableActFragment -> {
+                    navController.navigate(R.id.AvailableActFragment, null, options)
+                }
+                R.id.MyActFragment -> {
+                    navController.navigate(R.id.MyActFragment, null, options)
+                }
+            }
+
+            // Κλείσε το Drawer (αν υπάρχει, π.χ. σε Portrait)
+            drawerLayout?.closeDrawers()
+            true // Επιστρέφουμε true για να δείξουμε ότι το κλικ καταγράφηκε
+        }
 
         //Ρύθμιση του AppBarConfiguration
         val appBarConfiguration = AppBarConfiguration(
-            setOf(R.id.LoginFragment, R.id.AvailableActFragment, R.id.MyActFragment),
+            setOf(R.id.AvailableActFragment, R.id.MyActFragment, R.id.LoginFragment),
             drawerLayout
         )
 
@@ -71,7 +115,7 @@ class MainActivity : AppCompatActivity() {
         //Προσθήκη δραστηριότητας
         val fab = findViewById<FloatingActionButton>(R.id.floatingActionButton)
 
-        fab.setOnClickListener {
+        fab?.setOnClickListener {
             // Δημιουργία AlertDialog
             val builder = AlertDialog.Builder(this)
 
@@ -153,6 +197,7 @@ class MainActivity : AppCompatActivity() {
             }
             dialog.show()
         }
+        createNotificationChannel()
     }
 
     // Επιτρέπει στο κουμπί "πάνω αριστερά" (hamburger icon) να ανοίγει το μενού
@@ -162,13 +207,21 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
 
         val appBarConfiguration = AppBarConfiguration(
-            setOf(R.id.LoginFragment, R.id.AvailableActFragment, R.id.MyActFragment),
+            setOf(R.id.AvailableActFragment, R.id.MyActFragment, R.id.LoginFragment),
             drawerLayout
         )
-        return androidx.navigation.ui.NavigationUI.navigateUp(
-            navController,
-            appBarConfiguration
-        )
-                || super.onSupportNavigateUp()
+        return NavigationUI.navigateUp(navController, appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    private fun createNotificationChannel() {
+        val name = "JoinMe Channel"
+        val descriptionText = "Ειδοποιήσεις για συμμετοχή σε δραστηριότητες"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel("JOIN_ME_NOTIF", name, importance).apply {
+            description = descriptionText
+        }
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 }

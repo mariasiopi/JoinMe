@@ -4,7 +4,7 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/LoginFragment"
+            android:id="@+id/Profile"
             android:title="Προφίλ" />
         <item
             android:id="@+id/AvailableActFragment"
@@ -12,9 +12,6 @@
         <item
             android:id="@+id/MyActFragment"
             android:title="Δικές μου δραστηριότητες" />
-
-    </group>
-    <group android:checkableBehavior="single">
         <item
             android:id="@+id/settings"
             android:title="Ρυθμίσεις" />
