@@ -2,7 +2,6 @@ package com.example.joinme.data.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "activities",
@@ -21,10 +20,5 @@ data class Activity (
     val time: String = "",
     val maxParticipants: Int = 0,
     val location: String = "",
-
-    @Ignore var currentParticipants: Int = 0
-    ){
-    // Χρειάζεται αυτός ο constructor για να μην μπερδεύεται η Room
-    constructor(id: Long, title: String, creatorId: Long, date: String, time: String, maxParticipants: Int, location: String) :
-            this(id, title, creatorId, date, time, maxParticipants, location, 0)
-}
+    var currentParticipants: Int = 0
+    )
