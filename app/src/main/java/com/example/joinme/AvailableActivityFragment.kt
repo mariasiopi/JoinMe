@@ -2,12 +2,14 @@ package com.example.joinme
 
 import android.os.Bundle
 import android.view.View
+import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.room.Query
 import kotlinx.coroutines.launch
 
 class AvailableActivityFragment : Fragment(R.layout.fragment_available_activity) {
@@ -39,6 +41,26 @@ class AvailableActivityFragment : Fragment(R.layout.fragment_available_activity)
             }
         }
 
+        //Αναζήτηση δραστηριότητας στο searchView
+        val searchView = view.findViewById<SearchView>(R.id.searchView)
 
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(newText: String?): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(query: String?): Boolean {
+                if (!query.isNullOrEmpty()) {
+                    viewModel.searchActivitiesInCloud(query)
+                }
+                return true
+            }
+        })
+
+        //Εμφάνιση αποτελεσμάτων
+        viewModel.searchResults.observe(viewLifecycleOwner) { activities ->
+            adapter.updateData(activities)
+        }
     }
 }

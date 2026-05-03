@@ -54,7 +54,6 @@ class ActivityAdapter(private val activityList: MutableList<Activity> = mutableL
             holder.participateBtn.setBackgroundColor(android.graphics.Color.MAGENTA)
             holder.participateBtn.setOnClickListener { onParticipateClick(item) }
 
-
             // Αυτό τρέχει ΚΑΘΕ ΦΟΡΑ που εμφανίζεται μια κάρτα
             if (currentParticipants >= maxParticipants) {
                 holder.participateBtn.isEnabled = false

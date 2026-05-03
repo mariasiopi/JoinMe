@@ -1,6 +1,7 @@
 package com.example.joinme
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -41,8 +42,22 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
     }
 
     // Συνάρτηση για προσθήκη (Insert) - καλείται από το FAB της MainActivity
+    private val _showNotification = MutableLiveData<String?>()
+    val showNotification: LiveData<String?> get() = _showNotification
+    fun doneShowingNotification() {
+        _showNotification.value = null
+    }
     fun insert(activity: Activity) = viewModelScope.launch(Dispatchers.IO) {
         activitiesDao.insertActivity(activity)
+        firestore.collection("Activities")
+            .add(activity)
+            .addOnSuccessListener {
+                // ΕΔΩ θα καλέσουμε το Notification μόλις επιβεβαιωθεί η εγγραφή!
+                _showNotification.postValue("Η δραστηριότητα ${activity.title} δημιουργήθηκε!")
+            }
+            .addOnFailureListener { e ->
+                Log.e("FirestoreError", "Σφάλμα κατά την εγγραφή", e)
+            }
     }
 
     fun delete(activity: Activity) = viewModelScope.launch(Dispatchers.IO) {
@@ -58,18 +73,46 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+
     //-----------------------Firestore--------------------------------
-    fun participateInActivityCloud(activity: Activity, username: String, email: String) {
-        val participation = hashMapOf(
-            "activityId" to activity.id,
-            "activityTitle" to activity.title,
-            "username" to username,
-            "email" to email
-        )
-        firestore.collection("participations")
-            .add(participation)
-            .addOnFailureListener{
-                //
+    fun getParticipationsByUser(username: String) {
+        firestore.collection("Participations")
+            .whereEqualTo("participantName", username)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+
+                }
+            }
+    }
+
+    val searchResults = MutableLiveData<List<Activity>>()
+    fun searchActivitiesInCloud(queryTitle: String) {
+        firestore.collection("Activities")
+            .orderBy("activityTitle")
+            .startAt(queryTitle)
+            .endAt(queryTitle + "\uf8ff")
+            .get()
+            .addOnSuccessListener { documents ->
+                val list = mutableListOf<Activity>()
+
+                for (document in documents) {
+                    val tempActivity = document.toObject(Activity::class.java)
+
+                    // Δημιουργούμε το αντίγραφο με το σωστό ID
+                    val finalActivity = tempActivity?.copy(
+                        id = document.id.hashCode().toLong()
+                    )
+
+                    // Η προσθήκη πρέπει να γίνει ΕΔΩ μέσα, για κάθε έγγραφο!
+                    finalActivity?.let { list.add(it) }
+                }
+
+                // Αφού τελειώσει το loop, δίνουμε όλη τη λίστα στο LiveData
+                searchResults.value = list
+            }
+            .addOnFailureListener {
+                searchResults.value = emptyList()
             }
     }
 }

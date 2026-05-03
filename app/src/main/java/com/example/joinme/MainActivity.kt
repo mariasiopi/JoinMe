@@ -4,7 +4,9 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -12,6 +14,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -26,6 +31,7 @@ import com.example.joinme.data.entities.Activity
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import android.Manifest
 
 class MainActivity : AppCompatActivity() {
     private lateinit var activityViewModel: ActivityViewModel
@@ -110,6 +116,13 @@ class MainActivity : AppCompatActivity() {
         activityViewModel.currentId.observe(this) { id ->
             if (id != null) {
                 currentId = id // Ενημέρωση της μεταβλητής μόλις αλλάξει το ID στο Login
+            }
+        }
+
+        activityViewModel.showNotification.observe(this) { message ->
+            message?.let {
+                sendNotification(it)
+                activityViewModel.doneShowingNotification() // Πολύ σημαντικό για να μην ξαναχτυπάει στο rotate
             }
         }
         //Προσθήκη δραστηριότητας
@@ -198,6 +211,12 @@ class MainActivity : AppCompatActivity() {
             dialog.show()
         }
         createNotificationChannel()
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
+            }
+        }
     }
 
     // Επιτρέπει στο κουμπί "πάνω αριστερά" (hamburger icon) να ανοίγει το μενού
@@ -216,12 +235,38 @@ class MainActivity : AppCompatActivity() {
     private fun createNotificationChannel() {
         val name = "JoinMe Channel"
         val descriptionText = "Ειδοποιήσεις για συμμετοχή σε δραστηριότητες"
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val importance = NotificationManager.IMPORTANCE_HIGH
         val channel = NotificationChannel("JOIN_ME_NOTIF", name, importance).apply {
             description = descriptionText
         }
         val notificationManager: NotificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
+    }
+
+
+    fun sendNotification(message: String) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                // Αν δεν έχουμε άδεια, σταματάμε εδώ ή ζητάμε την άδεια
+                return
+            }
+        }
+
+        val builder = NotificationCompat.Builder(this, "JOIN_ME_NOTIF")
+            .setSmallIcon(R.drawable.baseline_check_circle_outline_24) // Βάλε ένα δικό σου εικονίδιο
+            .setContentTitle("JoinMe Επιτυχία!")
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+
+        try {
+            with(NotificationManagerCompat.from(this)) {
+                notify(System.currentTimeMillis().toInt(), builder.build())
+            }
+        } catch (e: SecurityException) {
+            Log.e("NotificationError", "Δεν υπάρχει άδεια για ειδοποιήσεις", e)
+        }
     }
 }

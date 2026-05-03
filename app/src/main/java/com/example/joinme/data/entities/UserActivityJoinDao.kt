@@ -11,4 +11,6 @@ interface UserActivityJoinDao {
     @Insert
     fun insertJoin(join: UserActivityJoin)
 
+    /*@Query("SELECT activityId FROM UserActivityJoin WHERE participantId = :participantId")
+    fun getJoin(participantId: Long): Flow<List<UserActivityJoinDao>>*/
 }

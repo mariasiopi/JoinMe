@@ -13,9 +13,6 @@ interface ActivitiesDao {
     @Insert
     fun insertActivity(activity: Activity)
 
-    @Update
-    fun updateActivity(activity: Activity)
-
     @Delete
     fun deleteActivity(activity: Activity)
 
@@ -30,4 +27,5 @@ interface ActivitiesDao {
     @Query("""UPDATE activities SET currentParticipants = currentParticipants + 1 
             WHERE id = :activityId AND currentParticipants < maxParticipants""")
     fun incParticipants(activityId: Long)
+
 }

@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.Room
 
-@Database(entities = [User::class, Activity::class, UserActivityJoin::class], version = 1)
+@Database(entities = [User::class, Activity::class, UserActivityJoin::class], version = 2)
 
 abstract class AppDatabase : RoomDatabase() {
     abstract fun activitiesDao(): ActivitiesDao
@@ -22,7 +22,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "joinme_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
