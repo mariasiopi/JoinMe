@@ -1,7 +1,6 @@
 package com.example.joinme
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -84,7 +83,7 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
                 .add(participationData)
 
             firestore.collection("Activities")
-                .document(activityId.toString()) // Χρησιμοποιούμε το ID ως όνομα εγγράφου
+                .document(activityId.toString())
                 .update("currentParticipants", com.google.firebase.firestore.FieldValue.increment(1))
 
         }
@@ -92,23 +91,13 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
 
 
     //-----------------------Firestore--------------------------------
-    fun getParticipationsByUser(username: String) {
-        firestore.collection("Participations")
-            .whereEqualTo("participantName", username)
-            .get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-
-                }
-            }
-    }
 
     //Αναζήτηση δραστηριότητας στο Firebase
     val searchResults = MutableLiveData<List<Activity>>()
-    val isSearching = MutableLiveData<Boolean>(false) //true αν γράφει στην αναζήτηση
+    val isSearching = MutableLiveData(false) //true αν γράφει στην αναζήτηση
     fun searchActivitiesInCloud(queryTitle: String) {
         if (queryTitle.isEmpty()) {
-            clearSearch() //αν είναι αδειο σταματά την αναζήτηση
+            clearSearch() //αν είναι άδειο σταματά την αναζήτηση
             return
         }
 
@@ -116,7 +105,7 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
         firestore.collection("Activities")
             .orderBy("title")
             .startAt(queryTitle)
-            .endAt(queryTitle + "\uf8ff") //μεχρι οποιαδηποτε λεξη
+            .endAt(queryTitle + "\uf8ff") //μέχρι οποιαδήποτε λέξη
             .get()
             .addOnSuccessListener { documents ->
                 val list = mutableListOf<Activity>()
@@ -138,6 +127,6 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
     }
     fun clearSearch() {
         isSearching.value = false
-        searchResults.value = emptyList() // Καθαρίζουμε τα cloud αποτελέσματα
+        searchResults.value = emptyList()
     }
 }

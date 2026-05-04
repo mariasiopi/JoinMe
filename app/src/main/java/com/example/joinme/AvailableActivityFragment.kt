@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.room.Query
 import kotlinx.coroutines.launch
 
 class AvailableActivityFragment : Fragment(R.layout.fragment_available_activity) {
@@ -43,7 +42,34 @@ class AvailableActivityFragment : Fragment(R.layout.fragment_available_activity)
             }
         }
 
-        //Παρακολούθηση της Firebase (Cloud)
+        //Αναζήτηση δραστηριότητας στο searchView
+        val searchView = view.findViewById<SearchView>(R.id.searchView)
+
+        // Όταν πατιέται το "X" στην μπάρα
+        searchView.setOnCloseListener {
+            viewModel.clearSearch() // Επαναφέρει το isSearching σε false
+            false
+        }
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            // Αναζήτηση με το πάτημα του Enter
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let { viewModel.searchActivitiesInCloud(it) }
+                return true
+            }
+
+            override fun onQueryTextChange(query: String?): Boolean {
+                if (!query.isNullOrEmpty()) { // Αναζήτηση καθώς πληκτρολογεί
+                    viewModel.searchActivitiesInCloud(query)
+                }
+                if (query.isNullOrEmpty()) {
+                    viewModel.clearSearch() // Επαναφορά όταν σβηστεί το κείμενο
+                }
+                return true
+            }
+        })
+
         viewModel.searchResults.observe(viewLifecycleOwner) { cloudActivities ->
             if (viewModel.isSearching.value == true) {
                 adapter.updateData(cloudActivities)
@@ -63,34 +89,5 @@ class AvailableActivityFragment : Fragment(R.layout.fragment_available_activity)
                 }
             }
         }
-
-        //Αναζήτηση δραστηριότητας στο searchView
-        val searchView = view.findViewById<SearchView>(R.id.searchView)
-
-        // 1. Όταν πατιέται το "X" στη μπάρα
-        searchView.setOnCloseListener {
-            viewModel.clearSearch() // Επαναφέρει το isSearching σε false
-            false
-        }
-
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-
-            // Αναζήτηση με το πάτημα του Enter
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let { viewModel.searchActivitiesInCloud(it) }
-                return true
-            }
-
-
-            override fun onQueryTextChange(query: String?): Boolean {
-                if (!query.isNullOrEmpty()) { // Αναζήτηση καθώς πληκτρολογεί
-                    viewModel.searchActivitiesInCloud(query)
-                }
-                if (query.isNullOrEmpty()) {
-                    viewModel.clearSearch() // Επαναφορά όταν σβηστεί το κείμενο[cite: 1]
-                }
-                return true
-            }
-        })
     }
 }

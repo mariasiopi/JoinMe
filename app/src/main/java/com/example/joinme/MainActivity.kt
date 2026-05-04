@@ -65,17 +65,17 @@ class MainActivity : AppCompatActivity() {
             val fab: FloatingActionButton? = findViewById(R.id.floatingActionButton)
             navView.setCheckedItem(destination.id)
             if (destination.id == R.id.LoginFragment) {
-                // 1. Κλειδώνουμε την οθόνη σε Portrait μόνο για το Login
+                // 1. Κλειδώνει την οθόνη σε Portrait μόνο για το Login
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-                // 2. Κρύβουμε FAB και Toolbar
+                // 2. Κρύβει FAB και Toolbar
                 fab?.visibility = View.GONE
                 supportActionBar?.hide()
             } else {
-                // 1. Επιτρέπουμε τη στροφή της οθόνης (Landscape) στις υπόλοιπες οθόνες
+                // 1. Επιτρέπει τη στροφή της οθόνης (Landscape) στις υπόλοιπες οθόνες
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
-                // 2. Εμφανίζουμε FAB και Toolbar
+                // 2. Εμφανίζει FAB και Toolbar
                 fab?.visibility = View.VISIBLE
                 supportActionBar?.show()
             }
@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
 
             // Κλείσε το Drawer (αν υπάρχει, π.χ. σε Portrait)
             drawerLayout?.closeDrawers()
-            true // Επιστρέφουμε true για να δείξουμε ότι το κλικ καταγράφηκε
+            true //το κλικ καταγράφηκε
         }
 
         //Ρύθμιση του AppBarConfiguration
@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity() {
         activityViewModel.showNotification.observe(this) { message ->
             message?.let {
                 sendNotification(it)
-                activityViewModel.doneShowingNotification() // Πολύ σημαντικό για να μην ξαναχτυπάει στο rotate
+                activityViewModel.doneShowingNotification() // για να μην ξαναχτυπάει στο rotate
             }
         }
         //Προσθήκη δραστηριότητας
@@ -192,7 +192,7 @@ class MainActivity : AppCompatActivity() {
                 val maxPart = maxParticipantsInput.text.toString().toIntOrNull() ?: 0
 
                 if (title.isNotEmpty()) {
-                    // Δημιουργούμε το νέο αντικείμενο
+                    // Δημιουργία το νέου αντικείμενου
                     val activityEntity = Activity(
                         title = title,
                         date = date,
@@ -203,7 +203,7 @@ class MainActivity : AppCompatActivity() {
                     )
                     // Προσθήκη στη λίστα και ενημέρωση του Adapter
                     activityViewModel.insert(activityEntity)
-                    dialog.dismiss() // Κλείνουμε τη φούσκα
+                    dialog.dismiss() // Κλείσιμο της φούσκας
                 } else {
                     titleInput.error = "Παρακαλώ βάλε έναν τίτλο"
                 }
@@ -232,6 +232,7 @@ class MainActivity : AppCompatActivity() {
         return NavigationUI.navigateUp(navController, appBarConfiguration) || super.onSupportNavigateUp()
     }
 
+    //Δημιουργία καναλιού ειδοποιήσεων
     private fun createNotificationChannel() {
         val name = "JoinMe Channel"
         val descriptionText = "Ειδοποιήσεις για συμμετοχή σε δραστηριότητες"
@@ -244,19 +245,11 @@ class MainActivity : AppCompatActivity() {
         notificationManager.createNotificationChannel(channel)
     }
 
-
     fun sendNotification(message: String) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED) {
-                // Αν δεν έχουμε άδεια, σταματάμε εδώ ή ζητάμε την άδεια
-                return
-            }
-        }
 
         val builder = NotificationCompat.Builder(this, "JOIN_ME_NOTIF")
-            .setSmallIcon(R.drawable.baseline_check_circle_outline_24) // Βάλε ένα δικό σου εικονίδιο
-            .setContentTitle("JoinMe Επιτυχία!")
+            .setSmallIcon(R.drawable.baseline_check_circle_outline_24)
+            .setContentTitle("JoinMe")
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)

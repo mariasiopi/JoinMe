@@ -37,7 +37,7 @@ class LoginFragment : Fragment(R.layout.fragment_login_fragment) {
                 val navOptions = NavOptions.Builder()
                     .setPopUpTo(R.id.LoginFragment, true) // Το 'true' σημαίνει ότι αφαιρεί και το ίδιο το LoginFragment
                     .build()
-                // Ο NavController διαβάζει το nav_graph.xml και σε πηγαίνει στο AvailableActFragment
+                // Ο NavController διαβάζει το nav_graph.xml και πηγαίνει στο AvailableActFragment
                 findNavController().navigate(R.id.AvailableActFragment, null, navOptions)
             }
         }
