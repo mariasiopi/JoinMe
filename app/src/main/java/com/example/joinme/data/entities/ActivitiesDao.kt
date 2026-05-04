@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface ActivitiesDao {
 
     @Insert
-    fun insertActivity(activity: Activity)
+    fun insertActivity(activity: Activity): Long
 
     @Delete
     fun deleteActivity(activity: Activity)

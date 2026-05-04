@@ -26,9 +26,14 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
 
 
     fun login(name: String, email: String) = viewModelScope.launch(Dispatchers.IO){
-        userDao.insertUser(User(username = name, email = email))
-        val userId = userDao.getUserIdByName(name)
-        _currentId.postValue(userId)
+        val newUser = User(username = name, email = email)
+        val generatedId = userDao.insertUser(newUser)
+        _currentId.postValue(generatedId)
+
+        val userForFirebase = User(userId = generatedId, username = name, email = email)
+        firestore.collection("users")
+            .document(generatedId.toString())
+            .set(userForFirebase)
     }
 
     // Ερώτημα 1: Όλες οι διαθέσιμες δραστηριότητες (χρήση Flow για αυτόματη ενημέρωση)
@@ -48,15 +53,15 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
         _showNotification.value = null
     }
     fun insert(activity: Activity) = viewModelScope.launch(Dispatchers.IO) {
-        activitiesDao.insertActivity(activity)
+        val newId = activitiesDao.insertActivity(activity)
+
+        val activityWithId = activity.copy(id = newId)
+
         firestore.collection("Activities")
-            .add(activity)
+            .document(newId.toString())
+            .set(activityWithId)
             .addOnSuccessListener {
-                // ΕΔΩ θα καλέσουμε το Notification μόλις επιβεβαιωθεί η εγγραφή!
                 _showNotification.postValue("Η δραστηριότητα ${activity.title} δημιουργήθηκε!")
-            }
-            .addOnFailureListener { e ->
-                Log.e("FirestoreError", "Σφάλμα κατά την εγγραφή", e)
             }
     }
 
@@ -70,6 +75,18 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
                 val join = UserActivityJoin(participantId = userId, activityId = activityId)
                 db.userActivityJoinDao().insertJoin(join)
                 db.activitiesDao().incParticipants(activityId)
+
+            val participationData = hashMapOf(
+                "activityId" to activityId,
+                "participantId" to userId
+            )
+            firestore.collection("Participations")
+                .add(participationData)
+
+            firestore.collection("Activities")
+                .document(activityId.toString()) // Χρησιμοποιούμε το ID ως όνομα εγγράφου
+                .update("currentParticipants", com.google.firebase.firestore.FieldValue.increment(1))
+
         }
     }
 
@@ -86,33 +103,41 @@ class ActivityViewModel(application: Application) : AndroidViewModel(application
             }
     }
 
+    //Αναζήτηση δραστηριότητας στο Firebase
     val searchResults = MutableLiveData<List<Activity>>()
+    val isSearching = MutableLiveData<Boolean>(false) //true αν γράφει στην αναζήτηση
     fun searchActivitiesInCloud(queryTitle: String) {
+        if (queryTitle.isEmpty()) {
+            clearSearch() //αν είναι αδειο σταματά την αναζήτηση
+            return
+        }
+
+        isSearching.value = true
         firestore.collection("Activities")
-            .orderBy("activityTitle")
+            .orderBy("title")
             .startAt(queryTitle)
-            .endAt(queryTitle + "\uf8ff")
+            .endAt(queryTitle + "\uf8ff") //μεχρι οποιαδηποτε λεξη
             .get()
             .addOnSuccessListener { documents ->
                 val list = mutableListOf<Activity>()
 
                 for (document in documents) {
+                    // Μετατροπή του Firebase εγγράφου σε αντικείμενο Activity
                     val tempActivity = document.toObject(Activity::class.java)
-
                     // Δημιουργούμε το αντίγραφο με το σωστό ID
                     val finalActivity = tempActivity?.copy(
-                        id = document.id.hashCode().toLong()
+                        id = document.id.toLongOrNull() ?: document.id.hashCode().toLong()
                     )
-
-                    // Η προσθήκη πρέπει να γίνει ΕΔΩ μέσα, για κάθε έγγραφο!
                     finalActivity?.let { list.add(it) }
                 }
-
-                // Αφού τελειώσει το loop, δίνουμε όλη τη λίστα στο LiveData
-                searchResults.value = list
+                searchResults.value = list // Ενημέρωση της λίστας αποτελεσμάτων
             }
             .addOnFailureListener {
                 searchResults.value = emptyList()
             }
+    }
+    fun clearSearch() {
+        isSearching.value = false
+        searchResults.value = emptyList() // Καθαρίζουμε τα cloud αποτελέσματα
     }
 }

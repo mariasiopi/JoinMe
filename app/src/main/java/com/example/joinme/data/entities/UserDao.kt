@@ -5,10 +5,6 @@ import androidx.room.Insert
 import androidx.room.Query
 @Dao
 interface UserDao {
-
     @Insert
-    fun insertUser(user: User)
-
-    @Query("SELECT userId FROM users WHERE username = :username")
-    fun getUserIdByName(username: String): Long
+    fun insertUser(user: User): Long
 }

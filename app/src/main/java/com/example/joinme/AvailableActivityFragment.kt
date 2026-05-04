@@ -34,8 +34,31 @@ class AvailableActivityFragment : Fragment(R.layout.fragment_available_activity)
         viewModel.currentId.observe(viewLifecycleOwner){ id ->
             if(id != null && id > 0){
                 viewLifecycleOwner.lifecycleScope.launch {
-                    viewModel.getAllActivities(id).collect { activities ->
-                        adapter.updateData(activities)
+                    viewModel.getAllActivities(id).asLiveData().observe(viewLifecycleOwner) { activities ->
+                        if (viewModel.isSearching.value == false) { // Αν δε γίνεται αναζήτηση δείχνει τα τοπικά δεδομένα
+                            adapter.updateData(activities)
+                        }
+                    }
+                }
+            }
+        }
+
+        //Παρακολούθηση της Firebase (Cloud)
+        viewModel.searchResults.observe(viewLifecycleOwner) { cloudActivities ->
+            if (viewModel.isSearching.value == true) {
+                adapter.updateData(cloudActivities)
+            }
+        }
+
+        viewModel.isSearching.observe(viewLifecycleOwner) { searching ->
+            if (!searching) {
+                // Αν σταμάτησε η αναζήτηση, ζήτα από τη Room την τρέχουσα λίστα
+                val id = viewModel.currentId.value
+                if (id != null) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.getAllActivities(id).collect { activities ->
+                            adapter.updateData(activities)
+                        }
                     }
                 }
             }
@@ -44,23 +67,30 @@ class AvailableActivityFragment : Fragment(R.layout.fragment_available_activity)
         //Αναζήτηση δραστηριότητας στο searchView
         val searchView = view.findViewById<SearchView>(R.id.searchView)
 
+        // 1. Όταν πατιέται το "X" στη μπάρα
+        searchView.setOnCloseListener {
+            viewModel.clearSearch() // Επαναφέρει το isSearching σε false
+            false
+        }
+
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
-            override fun onQueryTextSubmit(newText: String?): Boolean {
+            // Αναζήτηση με το πάτημα του Enter
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let { viewModel.searchActivitiesInCloud(it) }
                 return true
             }
 
+
             override fun onQueryTextChange(query: String?): Boolean {
-                if (!query.isNullOrEmpty()) {
+                if (!query.isNullOrEmpty()) { // Αναζήτηση καθώς πληκτρολογεί
                     viewModel.searchActivitiesInCloud(query)
+                }
+                if (query.isNullOrEmpty()) {
+                    viewModel.clearSearch() // Επαναφορά όταν σβηστεί το κείμενο[cite: 1]
                 }
                 return true
             }
         })
-
-        //Εμφάνιση αποτελεσμάτων
-        viewModel.searchResults.observe(viewLifecycleOwner) { activities ->
-            adapter.updateData(activities)
-        }
     }
 }

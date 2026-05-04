@@ -51,7 +51,6 @@ class ActivityAdapter(private val activityList: MutableList<Activity> = mutableL
             holder.participateBtn.setOnClickListener { onDeleteClick(item) }
         } else {
             holder.participateBtn.text = "Συμμετοχή"
-            holder.participateBtn.setBackgroundColor(android.graphics.Color.MAGENTA)
             holder.participateBtn.setOnClickListener { onParticipateClick(item) }
 
             // Αυτό τρέχει ΚΑΘΕ ΦΟΡΑ που εμφανίζεται μια κάρτα
@@ -61,7 +60,6 @@ class ActivityAdapter(private val activityList: MutableList<Activity> = mutableL
                 holder.participateBtn.text = "Πλήρες"
             } else {
                 holder.participateBtn.isEnabled = true
-                holder.participateBtn.setBackgroundColor(android.graphics.Color.MAGENTA)
                 holder.participateBtn.text = "Συμμετοχή"
             }
 
